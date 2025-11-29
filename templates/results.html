@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج الفحص - Card Testing Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --card-bg: #1a1a1a;
+            --primary-color: #00ff88;
+            --secondary-color: #ff6b6b;
+            --accent-color: #4dabf7;
+            --text-color: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image:
+                radial-gradient(circle at 20% 50%, #00ff8815 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, #4dabf715 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, #ff6b6b15 0%, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(26, 26, 26, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand i {
+            font-size: 1.8rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Summary Cards */
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .summary-card.total {
+            border-color: var(--accent-color);
+        }
+
+        .summary-card.total:hover {
+            box-shadow: 0 10px 30px rgba(77, 171, 247, 0.2);
+        }
+
+        .summary-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card.total .summary-icon {
+            color: var(--accent-color);
+        }
+
+        .summary-card.good .summary-icon {
+            color: var(--primary-color);
+        }
+
+        .summary-card.bad .summary-icon {
+            color: var(--secondary-color);
+        }
+
+        .summary-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Result Table */
+        .results-table {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .results-table thead {
+            background: var(--darker-bg);
+        }
+
+        .results-table th {
+            color: var(--primary-color);
+            font-weight: bold;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+        }
+
+        .results-table tbody tr:hover {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-badge.good {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .status-badge.bad {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+        }
+
+        .btn-export {
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            border: none;
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+            color: #000;
+        }
+
+        .btn-clear {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            border: none;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            color: #fff;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--darker-bg);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-info {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .brand {
+                font-size: 1.2rem;
+            }
+
+            .summary-number {
+                font-size: 2rem;
+            }
+
+            .summary-icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <a href="/" class="brand">
+                        <i class="bi bi-credit-card-2-front"></i>
+                        Card Testing Tool
+                    </a>
+                </div>
+                <div class="col-md-6 text-md-start">
+                    <div class="d-flex justify-content-md-end gap-3">
+                        <a href="/" class="text-white text-decoration-none">
+                            <i class="bi bi-house-door"></i> الرئيسية
+                        </a>
+                        <a href="/clear-results" class="text-white text-decoration-danger">
+                            <i class="bi bi-trash"></i> مسح النتائج
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="summary-card total">
+                    <i class="bi bi-calculator summary-icon"></i>
+                    <div class="summary-number" id="totalCount">0</div>
+                    <div>إجمالي البطاقات</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="summary-card good">
+                    <i class="bi bi-check-circle summary-icon"></i>
+                    <div class="summary-number text-success" id="goodCount">0</div>
+                    <div>البطاقات الجيدة</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="summary-card bad">
+                    <i class="bi bi-x-circle summary-icon"></i>
+                    <div class="summary-number text-danger" id="badCount">0</div>
+                    <div>البطاقات الرديئة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-center gap-3">
+                    <button class="btn btn-export" onclick="exportResults()">
+                        <i class="bi bi-download"></i> تصدير النتائج
+                    </button>
+                    <button class="btn btn-clear" onclick="clearAllResults()">
+                        <i class="bi bi-trash"></i> مسح كل النتائج
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="results-table">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>رقم البطاقة</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>الحالة</th>
+                            <th>الرسالة</th>
+                            <th>الوقت المستغرق</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- Results will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="bi bi-inbox"></i>
+                <h4>لا توجد نتائج</h4>
+                <p>لم يتم إجراء أي فحوصات بعد</p>
+                <a href="/" class="btn btn-primary">
+                    <i class="bi bi-play-circle"></i> ابدأ الفحص
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <div class="footer-links">
+                <a href="{{ channel }}" target="_blank">
+                    <i class="bi bi-telegram"></i> القناة
+                </a>
+                <a href="{{ owner }}" target="_blank">
+                    <i class="bi bi-person"></i> المالك
+                </a>
+            </div>
+            <div class="footer-info">
+                <p class="mb-0">المطور: {{ dev }}</p>
+                <p class="mb-0">جميع الحقوق محفوظة © 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let allResults = [];
+        let goodResults = [];
+        let badResults = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            loadResults();
+        });
+
+        // Load results from server
+        async function loadResults() {
+            try {
+                const response = await fetch('/results');
+                const data = await response.json();
+
+                // Update global variables
+                goodResults = data.good || [];
+                badResults = data.bad || [];
+                allResults = [...goodResults, ...badResults];
+
+                // Update summary cards
+                updateSummary();
+
+                // Update table
+                updateTable();
+            } catch (error) {
+                console.error('Error loading results:', error);
+                showEmptyState();
+            }
+        }
+
+        // Update summary cards
+        function updateSummary() {
+            const totalCount = goodResults.length + badResults.length;
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('goodCount').textContent = goodResults.length;
+            document.getElementById('badCount').textContent = badResults.length;
+        }
+
+        // Update results table
+        function updateTable() {
+            const tbody = document.getElementById('resultsTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (allResults.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Sort results by date (newest first)
+            const sortedResults = [...allResults].sort((a, b) =>
+                new Date(b.result.timestamp) - new Date(a.result.timestamp)
+            );
+
+            tbody.innerHTML = sortedResults.map((item, index) => {
+                const isGood = goodResults.includes(item);
+                const date = new Date(item.result.timestamp || Date.now());
+                const formattedDate = date.toLocaleDateString('ar-SA');
+                const formattedTime = date.toLocaleTimeString('ar-SA');
+
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${item.card}</strong></td>
+                        <td>${item.expiry}</td>
+                        <td>
+                            <span class="status-badge ${isGood ? 'good' : 'bad'}">
+                                ${isGood ? 'جيدة' : 'رديئة'}
+                            </span>
+                        </td>
+                        <td>${item.result.message || '-'}</td>
+                        <td>${item.result.elapsed || '-'}</td>
+                        <td>${formattedDate} ${formattedTime}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            document.getElementById('resultsTableBody').innerHTML = '';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        // Export results
+        function exportResults() {
+            if (allResults.length === 0) {
+                alert('لا توجد نتائج لتصديرها');
+                return;
+            }
+
+            // Create CSV content
+            const headers = ['رقم البطاقة', 'تاريخ الانتهاء', 'الحالة', 'الرسالة', 'الوقت المستغرق', 'التاريخ'];
+            const csvContent = [
+                headers.join(','),
+                ...allResults.map(item => [
+                    item.card,
+                    item.expiry,
+                    goodResults.includes(item) ? 'جيدة' : 'رديئة',
+                    `"${item.result.message || ''}"`,
+                    item.result.elapsed || '',
+                    item.result.timestamp || new Date().toISOString()
+                ].join(','))
+            ].join('\n');
+
+            // Create and download file
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `نتائج_الفحص_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Clear all results
+        async function clearAllResults() {
+            if (confirm('هل أنت متأكد من مسح جميع النتائج؟')) {
+                try {
+                    const response = await fetch('/clear-results', { method: 'POST' });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Reload page
+                        window.location.reload();
+                    } else {
+                        alert('حدث خطأ أثناء مسح النتائج');
+                    }
+                } catch (error) {
+                    console.error('Error clearing results:', error);
+                    alert('حدث خطأ أثناء مسح النتائج');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
